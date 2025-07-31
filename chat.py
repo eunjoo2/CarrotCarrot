@@ -5,10 +5,8 @@ import time # 채팅시간 저장
 from datetime import datetime
 import threading
 
-
-
 # 상수 처리
-HOST = '192.168.0.56'
+HOST = '192.168.0.55'
 PORT = 8080
 
 # 소켓 설정
@@ -16,8 +14,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((HOST, PORT))
 
 # 커서 생성
-conn = pymysql.connect(user='root', password='0000', db='carrot', charset='utf8')
-cur = conn.cursor()
+# conn = pymysql.connect(user='root', password='0000', db='carot', charset='utf8')
+# cur = conn.cursor()
 
 
 # ✅ 채팅방 클래스
@@ -62,13 +60,13 @@ class Chat:
             send_total += "," + nowtime
             sock.send(send_total.encode("utf-8"))
 
-            # SQL 수정
-            try:
-                chat_content = "INSERT INTO CHAT (content, date) VALUES (%s, %s)"
-                cur.execute(chat_content, (send_ms,nowtime))
-                conn.commit() # DB 반영
-            except Exception as e:
-                print("오류! 오류 원인 : ",e)
+            # # SQL 수정
+            # try:
+            #     chat_content = "INSERT INTO CHAT (content, date) VALUES (%s, %s)"
+            #     cur.execute(chat_content, (send_ms,nowtime))
+            #     conn.commit() # DB 반영
+            # except Exception as e:
+            #     print("오류! 오류 원인 : ",e)
 
             # 메시지 리스트 저장
             self.content.append(["sender",send_ms, nowtime]) # 2중 리스트
@@ -101,8 +99,48 @@ class Chat:
         return total
 
 
+import tkinter as tk
+from header import Header
+
+class CarrotMaker:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("CarrotCarrot")
+        self.root.geometry("400x600")
+
+        # 헤더 불러오기
+        self.header = Header(self.root)
+
+        # # 메인 영역
+        # self.body_frame = tk.Frame(self.root, bg="white")
+        # self.body_frame.pack(expand=True, fill="both")
+
+        # 예시 내용
+        # self.label = tk.Label(self.body_frame, text="메인 페이지입니다.", font=("Arial", 12))
+        # self.label.pack(pady=20)
+
+        # chat 프레임
+        self.chat_frame = tk.Frame(self.root, bg="black", height=490)
+        self.chat_frame.pack(expand=True, fill="x", anchor="n")
+
+        # 프레임 헤더1
+
+        # category 프레임
+        self.category_frame = tk.Frame(self.chat_frame, bg="red", height=40)
+        self.category_frame.pack(expand=True, fill="x", anchor="n")
+
+        # chat_content (채팅 1개씩 추가추가)
+        self.chat_content = tk.Frame(self.chat_frame, bg="blue", height=60)
+        self.chat_content.pack(expand=True, fill="x", anchor="n")
+
+        # self.btn_chat_total = tk.Button(self., text="전체", font=("Arial",12))
+        # self.btn_chat_total.pack(expand=True)
 
 
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = CarrotMaker(root)
+    root.mainloop()
 
 
 
