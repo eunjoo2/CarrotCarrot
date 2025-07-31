@@ -1,30 +1,30 @@
 from datetime import datetime
 
 class User:
-    def __init__(self, name, loacation):
+    def __init__(self, name, location):
         self.name = name
-        self.loacation = loacation
+        self.location = location
         self.posts = []
 
     def write_post(self, post):
         self.posts.append(post)
 
     def __str__(self):
-        return f'{self.name}({self.loacation})'
+        return f'{self.name}({self.location})'
 
 class Post:
-    def __init__(self, title, content, category, user_id):
+    def __init__(self, title, content, category, user):
         self.title = title
         self.content = content
         self.category = category
-        self.user_id = user_id
+        self.user = user
         self.timestamp = datetime.now()
         self.comments = []
 
         self.views = 0
         self.likes = set()
 
-        user_id.write_post(self)
+        user.write_post(self)
 
     def view(self):
         self.views = self.views + 1
@@ -47,7 +47,7 @@ class Post:
             print(f'{user.name} 님은 좋아요를 누르지 않았습니다.')
 
     def __str__(self):
-        return (f'{self.category}{self.title} / 작성자 : {self.user_id}' f'조회수 : {self.views}, 좋아요{len(self.likes)}')
+        return (f'{self.category}{self.title} / 작성자 : {self.user}' f'조회수 : {self.views}, 좋아요{len(self.likes)}')
 
 class Comment:
     def __init__(self, content, user_id):
@@ -56,7 +56,7 @@ class Comment:
         self.timestamp = datetime.now()
 
     def __str__(self):
-        return f'{self.user_id.username} : {self.content}'
+        return f'{self.user_id.name} : {self.content}'
 
 class AreaLife:
     def __init__(self):
