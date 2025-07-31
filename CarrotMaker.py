@@ -4,7 +4,7 @@ from header import Header
 class CarrotMaker:
     def __init__(self, root):
         self.root = root
-        self.root.title("CarrotCarrot - 당근 클론")
+        self.root.title("CarrotCarrot")
         self.root.geometry("400x600")
 
         # 헤더 불러오기
