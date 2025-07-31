@@ -18,6 +18,7 @@ class CarrotMaker:
         self.label = tk.Label(self.body_frame, text="메인 페이지입니다.", font=("Arial", 12))
         self.label.pack(pady=20)
 
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = CarrotMaker(root)

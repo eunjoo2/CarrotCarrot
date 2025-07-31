@@ -2,7 +2,7 @@ import socket
 import threading
 import mysql.connector
 
-HOST = "0.0.0.0"
+HOST = "192.168.0.4"
 PORT = 8080
 
 def handle_client(client_socket):
