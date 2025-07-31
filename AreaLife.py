@@ -1,16 +1,16 @@
 from datetime import datetime
 
 class User:
-    def __init__(self, name, lacation):
+    def __init__(self, name, loacation):
         self.name = name
-        self.lacation = lacation
+        self.loacation = loacation
         self.posts = []
 
     def write_post(self, post):
         self.posts.append(post)
 
     def __str__(self):
-        return f'{self.name}({self.lacation})'
+        return f'{self.name}({self.loacation})'
 
 class Post:
     def __init__(self, title, content, category, user_id):
@@ -35,16 +35,16 @@ class Post:
     def like(self, user):
         if user not in self.likes:
             self.likes.add(user)
-            print(f'{user.username} 님이 좋아요를 눌렀습니다.')
+            print(f'{user.name} 님이 좋아요를 눌렀습니다.')
         else:
-            print(f'{user.username} 님은 이미 좋아요를 눌렀습니다.')
+            print(f'{user.name} 님은 이미 좋아요를 눌렀습니다.')
 
     def unlike(self, user):
         if user in self.likes:
             self.likes.remove(user)
-            print(f'{user.username} 님이 좋아요를 취소했습니다.')
+            print(f'{user.name} 님이 좋아요를 취소했습니다.')
         else:
-            print(f'{user.username} 님은 좋아요를 누르지 않았습니다.')
+            print(f'{user.name} 님은 좋아요를 누르지 않았습니다.')
 
     def __str__(self):
         return (f'{self.category}{self.title} / 작성자 : {self.user_id}' f'조회수 : {self.views}, 좋아요{len(self.likes)}')
