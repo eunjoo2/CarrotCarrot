@@ -2,6 +2,7 @@
 import socket
 import pymysql
 import time # 채팅시간 저장
+from datetime import datetime
 import threading
 
 
@@ -30,7 +31,7 @@ class Chat:
         self.read_check = read_check # 카테고리(안 읽은 채팅방) 구분을 위함 # 🍪 False(안읽음) ... bool
         self.content = content  # 🍪 메시지 보관
 
-    # ☑️ 시간 확인 함수(메시지 관련)
+    # ☑️ 시간 확인 함수(메시지 관련) ex)오전, 00시 00분
     def time_check(self):
         t = time.localtime()
         tc = ""
@@ -93,7 +94,11 @@ class Chat:
 
     # ☑️ 약속잡기 ()
     def promise(self):
-        pass
+        time = self.time_check()
+        week = datetime.today().weekday() # 오늘의 요일
+        loc = input("주소를 입력하세요 : ")
+        total = [time,week,loc]
+        return total
 
 
 
