@@ -4,10 +4,10 @@ import pymysql
 import time # 채팅시간 저장
 import threading
 
-send_time, recv_time = "",""
+
 
 # 상수 처리
-HOST = '192.168.0.69'
+HOST = '192.168.0.56'
 PORT = 8080
 
 # 소켓 설정
@@ -30,9 +30,20 @@ class Chat:
         self.read_check = read_check # 카테고리(안 읽은 채팅방) 구분을 위함 # 🍪 False(안읽음) ... bool
         self.content = content  # 🍪 메시지 보관
 
+    # ☑️ 시간 확인 함수(메시지 관련)
+    def time_check(self):
+        t = time.localtime()
+        tc = ""
+        if t.tm_hour < 12:
+            tc = "오전"
+        else:
+            tc = "오후"
+        check_time = time.strftime("%I시 %M분", t)  # I시(01 ~ 12)
+        tc += "," + check_time
+        return tc
+
     # ☑️ 보낸 메시지
     def sendmessage(self):
-        global send_time
         while True:
             # "사용자 채팅 입력"
             send_ms = input("보낼 메세지 입력 : ")
@@ -40,56 +51,47 @@ class Chat:
             # "채팅방 나가기" 연결
             if send_ms == 'exit':
                 print("채팅 종료")
+                sock.shutdown(socket.SHUT_RDWR) # RD(소켓통신차단), WR(소켓송신차단), RDWR(송수신차단)
+                sock.close()
                 break
 
             # "보내기" 연결
-            sock.send(send_ms.encode("utf-8"))
-
-            # 보낸 시간
-            t = time.localtime()
-            if t.tm_hour < 12:
-                send_time = "오전"
-            else:
-                send_time = "오후"
-            check_time = time.strftime("%I시 %M분", t) # I시(01 ~ 12)
-            send_time += check_time
+            send_total = send_ms
+            nowtime = self.time_check() # 시간저장
+            send_total += "," + nowtime
+            sock.send(send_total.encode("utf-8"))
 
             # SQL 수정
             try:
                 chat_content = "INSERT INTO CHAT (content, date) VALUES (%s, %s)"
-                cur.execute(chat_content, (send_ms,send_time))
+                cur.execute(chat_content, (send_ms,nowtime))
                 conn.commit() # DB 반영
             except Exception as e:
                 print("오류! 오류 원인 : ",e)
 
             # 메시지 리스트 저장
-            self.content.append([send_ms, send_time]) # 2중 리스트
+            self.content.append(["sender",send_ms, nowtime]) # 2중 리스트
 
     # ☑️ 받은 메시지
     def receiveMessage(self):
-        global recv_time
         while True:
-            recv_ms = sock.recv(8192).decode("utf-8")
+            try:
+                recv_ms = sock.recv(8192).decode("utf-8")
+                nowtime = self.time_check()  # 시간저장
+                # 메시지 리스트 저장
+                self.content.append(["receiver", recv_ms, nowtime])  # 2중 리스트
+            except Exception: # 보내는 메시지가 exit 하면 종료
+                print("채팅 종료")
+                break
 
-            # 받은 시간
-            t = time.localtime()
-            if t.tm_hour < 12:
-                recv_time = "오전"
-            else:
-                recv_time = "오후"
-            check_time = time.strftime("%I시 %M분", t)  # I시(01 ~ 12)
-            recv_time += check_time
-
-            # 메시지 리스트 저장
-            self.content.append([recv_ms, recv_time])  # 2중 리스트
-
-    # 스레드 연결 / 채팅 시작
+    # ☑️ 스레드 연결 / 채팅 시작
     def start_chat(self):
         sender = threading.Thread(target=self.sendmessage)
         receiver = threading.Thread(target=self.receiveMessage)
         sender.start()
         receiver.start()
 
+    # ☑️ 약속잡기 ()
     def promise(self):
         pass
 
