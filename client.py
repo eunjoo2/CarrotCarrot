@@ -2,8 +2,6 @@ class CarrotMaker:
     def __init__(self):
         self.database = "carot"
 
-
-
 # client.py (수정된 버전)
 import socket
 
