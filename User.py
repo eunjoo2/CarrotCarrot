@@ -16,8 +16,9 @@ class User:
 
     def register(self):
         User.user_list.append(self)
-        print(f"등록 완료 : {self.nick_name} ")
-
+        msg = f"등록 완료 : {self.nick_name}"
+        print(msg)
+        return msg  # 반환 추가
 
     @classmethod
     def login(cls,phone_num):
