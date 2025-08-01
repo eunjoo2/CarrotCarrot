@@ -1,6 +1,7 @@
 import tkinter as tk
 from header import Header
 from bottom import bottom
+from opening import Opening
 
 class CarrotMaker:
 
