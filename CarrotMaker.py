@@ -3,17 +3,44 @@ from header import Header
 from bottom import bottom
 
 class CarrotMaker:
+
+    def go_to_next_stage(self):
+        self.logo_view.destroy()
+        self.show_second_page()
+
+    def show_second_page(self):
+        self.body_frame.destroy()
+        self.body_frame = tk.Frame(self.root, bg="white")
+        self.body_frame.pack(expand=True, fill="both")
+
+        label = tk.Label(self.body_frame, text="두번째 페이지 입니다.", font=("Arial", 12))
+        label.pack(pady=20)
+
+
     def __init__(self, root):
         self.root = root
         self.root.title("CarrotCarrot")
         self.root.geometry("400x600")
+        self.stage = 0
 
-        # 헤더
+
+        # 헤더 불러오기
         self.header = Header(self.root)
 
-        # 메인 영역
         self.body_frame = tk.Frame(self.root, bg="white")
         self.body_frame.pack(expand=True, fill="both")
+
+
+        if self.stage == 0:
+            self.logo_view = Opening(self.body_frame)
+
+            # 3초 후 화면 전환
+            self.root.after(3000, self.go_to_next_stage)
+
+
+        elif self.stage == 1:
+            self.body_frame = tk.Frame(self.root, bg="white")
+            self.body_frame.pack(expand=True, fill="both")
 
         # 예시 내용
         self.label = tk.Label(self.body_frame, text="메인 페이지입니다.", font=("Arial", 12))
@@ -21,6 +48,7 @@ class CarrotMaker:
 
         #하단 불러오기
         self.bottom = bottom(self.root)
+
 
 
 
