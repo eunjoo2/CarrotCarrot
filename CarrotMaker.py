@@ -46,8 +46,7 @@ class CarrotMaker:
         if self.stage == 0:
             self.logo_view = Opening(self.body_frame)
             self.root.after(3000, self.go_to_next_stage)
-        else:
-            self.show_page("홈")
+
 
         # Bottom
         self.bottom = bottom(self.root, self.show_page)
