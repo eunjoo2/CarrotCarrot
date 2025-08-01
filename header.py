@@ -7,5 +7,5 @@ class Header(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        title = tk.Label(self, text="당근마켓", fg="white", font=("Arial", 16, "bold"))
+        title = tk.Label(self, text="당근마켓", fg="white", font=("Arial", 16))
         title.pack(padx=10, pady=10, anchor="w")

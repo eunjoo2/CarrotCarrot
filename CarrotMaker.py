@@ -1,5 +1,6 @@
 import tkinter as tk
 from header import Header
+from bottom import bottom
 
 class CarrotMaker:
     def __init__(self, root):
@@ -7,7 +8,7 @@ class CarrotMaker:
         self.root.title("CarrotCarrot")
         self.root.geometry("400x600")
 
-        # 헤더 불러오기
+        # 헤더
         self.header = Header(self.root)
 
         # 메인 영역
@@ -17,6 +18,11 @@ class CarrotMaker:
         # 예시 내용
         self.label = tk.Label(self.body_frame, text="메인 페이지입니다.", font=("Arial", 12))
         self.label.pack(pady=20)
+
+        #하단 불러오기
+        self.bottom = bottom(self.root)
+
+
 
 if __name__ == "__main__":
     root = tk.Tk()
