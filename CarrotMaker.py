@@ -7,16 +7,27 @@ class CarrotMaker:
 
     def go_to_next_stage(self):
         self.logo_view.destroy()
-        self.show_second_page()
+        self.show_page("홈")  # 시작은 '홈'으로
 
-    def show_second_page(self):
+    def show_page(self, name):
+        # Body 제거 및 새로 생성
         self.body_frame.destroy()
         self.body_frame = tk.Frame(self.root, bg="white")
         self.body_frame.pack(expand=True, fill="both")
 
-        label = tk.Label(self.body_frame, text="두번째 페이지 입니다.", font=("Arial", 12))
-        label.pack(pady=20)
+        # 헤더 제목 바꾸기
+        self.header.update_title(name)
 
+        # Body 내부 페이지 출력
+        content = {
+            "홈": "홈 페이지.",
+            "동네생활": "동네생활 페이지.",
+            "동네지도": "동네지도 페이지.",
+            "채팅": "채팅 페이지.",
+            "나의당근": "나의 당근 페이지.",
+        }
+        msg = content.get(name, "페이지 없음")
+        tk.Label(self.body_frame, text=msg, font=("Arial", 12), bg="white").pack(pady=20)
 
     def __init__(self, root):
         self.root = root
@@ -24,33 +35,22 @@ class CarrotMaker:
         self.root.geometry("400x600")
         self.stage = 0
 
-
-        # 헤더 불러오기
+        # Header
         self.header = Header(self.root)
 
+        # Body
         self.body_frame = tk.Frame(self.root, bg="white")
         self.body_frame.pack(expand=True, fill="both")
 
-
+        # Opening
         if self.stage == 0:
             self.logo_view = Opening(self.body_frame)
-
-            # 3초 후 화면 전환
             self.root.after(3000, self.go_to_next_stage)
+        else:
+            self.show_page("홈")
 
-
-        elif self.stage == 1:
-            self.body_frame = tk.Frame(self.root, bg="white")
-            self.body_frame.pack(expand=True, fill="both")
-
-        # 예시 내용
-        self.label = tk.Label(self.body_frame, text="메인 페이지입니다.", font=("Arial", 12))
-        self.label.pack(pady=20)
-
-        #하단 불러오기
-        self.bottom = bottom(self.root)
-
-
+        # Bottom
+        self.bottom = bottom(self.root, self.show_page)
 
 
 if __name__ == "__main__":

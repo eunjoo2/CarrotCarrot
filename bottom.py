@@ -1,11 +1,31 @@
 import tkinter as tk
+from PIL import Image, ImageTk
+from tkinter import PhotoImage
 
-class bottom (tk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master, bg="#ffffff", height=30)
-        self.pack(side=tk.BOTTOM, fill="x")
-        self.create_widgets()
+class bottom(tk.Frame):
+    def __init__(self, master, on_nav_click):
+        super().__init__(master, bg="white")
+        self.pack(side="bottom", fill="x")
 
-    def create_widgets(self):
-        title = tk.Label(self, text="하단 버튼", fg="#000000",bg="#ffffff" ,font=("Arial", 16, "bold") )
-        title.pack(padx=10, pady=10, anchor="w")
+        self.icons = {
+            "홈": PhotoImage(file="./img/home-svgrepo-com.svg"),
+            "동네생활": PhotoImage(file="./img/journal-page-svgrepo-com.svg"),
+            "동네지도": PhotoImage(file="./img/location-svgrepo-com.svg"),
+            "채팅": PhotoImage(file="./img/chat-round-dots-svgrepo-com.svg"),
+            "나의당근": PhotoImage(file="./img/users-svgrepo-com.svg"),
+        }
+
+        for text, icon in self.icons.items():
+            btn = tk.Button(
+                self,
+                image=icon,
+                text=text,
+                compound="top",
+                bd=0,
+                relief="flat",
+                bg="white",
+                fg="black",
+                font=("Arial", 9),
+                command=lambda t=text: on_nav_click(t)  # 👈 콜백 연결
+            )
+            btn.pack(side="left", expand=True, fill="x")
