@@ -32,7 +32,8 @@ class bottom(tk.Frame):
                 relief="flat",
                 bg="white",
                 fg="black",
-                font=("Arial", 9),
+                font=("Arial", 8, "bold"),
+                pady=5,
                 command=lambda t=text: on_nav_click(t)
             )
-            btn.pack(side="left", expand=True, fill="x")
+            btn.pack(side="left", expand=True, fill="x",padx=10, pady=10)
