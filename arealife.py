@@ -1,21 +1,6 @@
 from datetime import datetime
 from User import User
 
-# # 사용자 클래스 : 사용자 정보
-# class User:
-#     def __init__(self, user_id, name, location):
-#         self.user_id = user_id # 회원 고유 아이디
-#         self.name = name # 사용자 이름
-#         self.location = location # 지역 정보
-#         self.posts = [] # 사용자가 작성한 게시글을 저장하는 리스트
-#
-#     # 사용자가 게시글을 작성할 때 posts 리스트에 게시글을 추가
-#     def write_post(self, post):
-#         self.posts.append(post)
-#
-#     def __str__(self):
-#         return f'{self.name}({self.location})'
-
 # 동네생활 클래스 : 게시글 하나의 정보
 class AreaLife:
     def __init__(self, life_id, user, title, content, status):

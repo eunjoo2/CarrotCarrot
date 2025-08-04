@@ -1,5 +1,4 @@
 import tkinter as tk
-import tkinter as tk
 from tkinter import messagebox
 
 class AreaLifePage:
@@ -15,15 +14,25 @@ class AreaLifePage:
         # 글쓰기 입력 폼 프레임 (초기에는 숨김)
         self.form_frame = tk.Frame(self.body_frame, bg="#FAFAF6")
 
-        # 제목 라벨과 입력창
-        tk.Label(self.form_frame, text="제목", font=("맑은 고딕", 10), bg="#FAFAF6").grid(row=0, column=0, sticky="w")
-        self.title_entry = tk.Entry(self.form_frame, width=32, font=("맑은 고딕", 11))
-        self.title_entry.grid(row=0, column=1, sticky="ew", padx=(7,0))
-        tk.Label(self.form_frame, text="내용", font=("맑은 고딕", 10), bg="#FAFAF6").grid(row=1, column=0, sticky="nw")
+        # 제목 Entry
+        # tk.Label(self.form_frame, text="제목", font=("맑은 고딕", 10), bg="#FAFAF6").grid(row=0, column=0, sticky="w")
+        self.title_entry = tk.Entry(self.form_frame, width=40, font=("맑은 고딕", 10))
+        self.title_entry.grid(row=0, column=1, sticky="w", padx=(7,0))
+        self.title_placeholder = "제목을 입력하세요."
+        self.title_entry.insert(0, self.title_placeholder)
+        self.title_entry.config(fg="gray")
+        self.title_entry.bind("<FocusIn>", self.clear_title_placeholder)
+        self.title_entry.bind("<FocusOut>", self.restore_title_placeholder)
 
-        # 내용 라벨과 입력창(여러줄)
-        self.content_entry = tk.Text(self.form_frame, width=32, height=3, font=("맑은 고딕",10))
-        self.content_entry.grid(row=1, column=1, padx=(7,0), pady=3)
+        # 내용 Text
+        # tk.Label(self.form_frame, text="내용", font=("맑은 고딕", 10), bg= "#FAFAF6").grid(row=1, column=0, sticky="nw")
+        self.content_entry = tk.Text(self.form_frame, width=40, height=3, font=("맑은 고딕",10))
+        self.content_entry.grid(row=1, column=1, sticky="w", padx=(7,0), pady=3)
+        self.content_placeholder = "둔산동 이웃과 이야기를 나눠보세요."
+        self.content_entry.insert("1.0", self.content_placeholder)
+        self.content_entry.config(fg="gray")
+        self.content_entry.bind("<FocusIn>", self.clear_content_placeholder)
+        self.content_entry.bind("<FocusOut>", self.restore_content_placeholder)
 
         # 등록 버튼
         self.submit_btn = tk.Button(self.form_frame, text="등록", bg="#FF6F0F", fg="white", font=("맑은 고딕", 10, "bold"),width=8, command=self.submit_post, bd=0)
@@ -45,8 +54,11 @@ class AreaLifePage:
         self.canvas_window = self.canvas.create_window((0,0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=scroll.set)
 
+        # # 마우스 휠 스크롤 기능
+        # self.canvas.bind_all("<MouseWheel>", lambda e: self.canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
+
         # 마우스 휠 스크롤 기능
-        self.canvas.bind_all("<MouseWheel>", lambda e: self.canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
+        self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
 
         # canvas 크기 조절될때 내부 프레임 크기 동기화
         def resize_canvas(event):
@@ -65,13 +77,45 @@ class AreaLifePage:
         # 게시글 불러오기
         self.load_posts()
 
+    # 제목 Entry에 포커스가 생기면 placeholder 제거
+    def clear_title_placeholder(self, event=None):
+        current = self.title_entry.get()
+        if current == self.title_placeholder:
+            self.title_entry.delete(0, "end")
+            self.title_entry.config(fg="black")
+
+    # 제목 Entry에 포커스가 사라지면 placeholder 복원
+    def restore_title_placeholder(self, event=None):
+        current = self.title_entry.get().strip()
+        if not current:
+            self.title_entry.insert(0, self.title_placeholder)
+            self.title_entry.config(fg="gray")
+
+    # 내용 Text에 포커스가 생기면 placeholder 제거
+    def clear_content_placeholder(self, event=None):
+        current = self.content_entry.get("1.0", "end").strip()
+        if current == self.content_placeholder:
+            self.content_entry.delete("1.0", "end")
+            self.content_entry.config(fg="black")
+
+    # 내용 Text에 포커스가 사라지면 placeholder 복원
+    def restore_content_placeholder(self, event=None):
+        current = self.content_entry.get("1.0", "end").strip()
+        if not current:
+            self.content_entry.insert("1.0", self.content_placeholder)
+            self.content_entry.config(fg="gray")
+
+    # 마우스 휠 스크롤 처리 함수
+    def on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
     # 글쓰기 입력 폼을 보여주거나 숨기는 함수
     def toggle_form(self):
         if self.form_visible:
             self.form_frame.pack_forget() # 폼 숨김
             self.write_btn.place(relx=1.0, rely=1.0, x=-20, y=-20, anchor="se")  # 글쓰기 버튼 다시 표시
         else:
-            self.form_frame.pack(fill="x", padx=16, pady=(10,8)) # 폼 표시
+            self.form_frame.pack(fill="x", padx=16, pady=(4,4), side="top", anchor="n") # 폼 표시
             self.write_btn.place_forget()  # 글쓰기 버튼 숨기기
         self.form_visible = not self.form_visible
 
@@ -92,9 +136,12 @@ class AreaLifePage:
             self.add_post_card(post) # UI에 추가
             self.title_entry.delete(0, "end") # 입력창 초기화
             self.content_entry.delete("1.0", "end")
+            self.restore_title_placeholder()
+            self.restore_content_placeholder()
             self.toggle_form()  # 폼 닫고 버튼 다시 보이게
         else:
             messagebox.showerror("글쓰기 실패", "로그인 후 이용 가능합니다.")
+
 
     # 하나의 게시글을 카드 형식으로 UI에 표시
     def add_post_card(self, post):
