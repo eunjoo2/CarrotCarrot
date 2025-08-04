@@ -6,6 +6,12 @@ class Header(tk.Frame):
         self.pack(fill="x")
         self.create_widgets()
 
+    ##### title앞에 self
     def create_widgets(self):
-        title = tk.Label(self, text="", fg="white", bg=self["bg"], font=("Arial", 16, "bold"))
-        title.pack(padx=10, pady=10, anchor="w")
+        self.title = tk.Label(self, text="", fg="white", bg=self["bg"], font=("Arial", 16, "bold"))
+        self.title.pack(padx=10, pady=10, anchor="w")
+
+
+    ###### 아래 부분 추가
+    def update_title(self, new_title):
+        self.title.config(text=new_title)
