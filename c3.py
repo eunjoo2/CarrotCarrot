@@ -1,0 +1,84 @@
+from header import Header
+from bottom import bottom
+from opening import Opening
+from arealife_page import AreaLifePage
+from arealife import AreaLifeBoard
+from User import User
+
+import tkinter as tk
+
+class CarrotMaker:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("CarrotCarrot")
+        self.root.geometry("400x600")
+
+        self.stage = 0  # 앱 실행 초기 화면 판단용 (예: 오프닝 로고)
+
+        # 사용자 및 게시판 생성
+        self.user = User(user_id="u001", nick_name="민기", area_name="서울", phone_num="010-1111-2222", temper=36.5, block_list=[], bad_count=0)
+        self.board = AreaLifeBoard()
+
+        # 상단 헤더 생성
+        self.header = Header(self.root)
+
+        # 바디 프레임 생성
+        self.body_frame = tk.Frame(self.root, bg="white")
+        self.body_frame.pack(expand=True, fill="both")
+
+        # 오프닝 화면 처리
+        if self.stage == 0:
+            self.logo_view = Opening(self.body_frame)
+            self.root.after(3000, self.go_to_next_stage)
+
+        # 하단 네비게이션 바 생성
+        self.bottom = bottom(self.root, self.show_page)
+
+    def go_to_next_stage(self):
+        self.logo_view.destroy()
+        self.show_page("홈")
+
+    def show_page(self, name):
+        # 기존 body_frame 제거 후 새로 생성
+        self.body_frame.destroy()
+        self.body_frame = tk.Frame(self.root, bg=self.get_page_color(name))
+        # self.body_frame = tk.Frame(self.root, bg=“white") # get_page_color 함수 지우면 이거 활성화
+        self.body_frame.pack(expand=True, fill="both")
+
+        # 헤더 타이틀 변경
+        self.header.update_title(name)
+
+        # 페이지 조건별 분기
+        if name == "홈":
+            tk.Label(self.body_frame, text="홈 페이지", font=("Arial", 12), bg=self.get_page_color(name)).pack(pady=20)
+
+        elif name == "동네생활":
+            AreaLifePage(self.body_frame, self.board, self.user)  # 따로 pack 필요 없음 (내부에서 구현됨)
+
+        elif name == "동네지도":
+            tk.Label(self.body_frame, text="동네지도 페이지", font=("Arial", 12), bg=self.get_page_color(name)).pack(pady=20)
+
+        elif name == "채팅":
+            tk.Label(self.body_frame, text="채팅 페이지", font=("Arial", 12), bg=self.get_page_color(name)).pack(pady=20)
+
+        elif name == "나의당근":
+            tk.Label(self.body_frame, text="나의 당근 페이지", font=("Arial", 12), bg=self.get_page_color(name)).pack(pady=20)
+
+        else:
+            tk.Label(self.body_frame, text="[오류] 페이지를 찾을 수 없습니다.", font=("Arial", 12), bg="#FFCCCC").pack(pady=20)
+
+    def get_page_color(self, name):
+        colors = {
+            "홈": "#FFFFFF",
+            "동네생활": "#FFFACD",
+            "동네지도": "#E0FFE0",
+            "채팅": "#E0F0FF",
+            "나의당근": "#F5F5F5"
+        }
+        return colors.get(name, "#FFFFFF")
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = CarrotMaker(root)
+    root.mainloop()
