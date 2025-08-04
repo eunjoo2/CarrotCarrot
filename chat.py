@@ -153,11 +153,11 @@ class Chat_page:
 
         self.canvas = tk.Canvas(self.frame, bg="white", highlightthickness=0)
         self.scrollbar = ttk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
-        self.scroll_frame = tk.Frame(self.canvas, bg="white")
+        self.msg_frame = tk.Frame(self.canvas, bg="white")
 
-        self.scroll_frame.bind("<Configure>",
+        self.msg_frame.bind("<Configure>",
                                lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-        self.canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
+        self.canvas.create_window((0, 0), window=self.msg_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -174,8 +174,6 @@ class Chat_page:
         self.send_button = tk.Button(entry_frame, text="전송", command=self.send_message)
         self.send_button.pack(side="right", padx=10)
 
-        self.display_message()
-
         # 메시지 띄우기
         self.display_message()
 
@@ -184,27 +182,55 @@ class Chat_page:
         if msg:
             now = datetime.datetime.now().strftime("%H:%M")
             formatted_msg = {
-                "sender": self.user["nickname"],
+                "sender": self.user.nickname,
                 "text": msg,
                 "date": now,
             }
             # f"{self.user.nick_name}: {msg}"
             self.msgs.append(formatted_msg) # 메시지 저장🍪🍪🍪🍪
-            self.append_text(formatted_msg)
+            self.display_single_message(formatted_msg)
             self.entry.delete(0, tk.END)
 
-
-    def append_text(self, msg):
-        self.text_area.config(state="normal")
-        self.text_area.insert(tk.END, msg + "\n")
-        self.text_area.config(state="disabled")
-        self.text_area.see(tk.END)
+    # def append_text(self, msg):
+    #     self.text_area.config(state="normal")
+    #     self.text_area.insert(tk.END, msg + "\n")
+    #     self.text_area.config(state="disabled")
+    #     self.text_area.see(tk.END)
 
     def display_message(self):
         for msg in self.msgs:
-            self.append_text(msg)
+            self.display_single_message(msg)
 
+    def display_single_message(self, msg):
+        is_me = (msg["sender"] == self.user.nickname)
+        bubble_frame = tk.Frame(self.msg_frame, bg="white", pady=2)
+        bubble_frame.pack(anchor="e" if is_me else "w", padx=10, pady=2)
 
+        # 말풍선 라벨
+        bubble = tk.Label(
+            bubble_frame,
+            text=msg["text"],
+            bg="#DCF8C6" if is_me else "#FFFFFF",
+            fg="black",
+            font=("맑은 고딕", 10),
+            bd=1,
+            relief="solid",
+            wraplength=250,
+            justify="left",
+            padx=10,
+            pady=5
+        )
+        bubble.pack(anchor="e" if is_me else "w")
+
+        # 시간 표시 (작게)
+        time_label = tk.Label(
+            bubble_frame,
+            text=msg["time"],
+            font=("맑은 고딕", 8),
+            fg="gray",
+            bg="white"
+        )
+        time_label.pack(anchor="e" if is_me else "w")
 """
 완, 뒤로가기 버튼, 메시지 저장
 카테고리 연결, 채팅방 자동 시간 연결, 사용자 이미지 연결, 채팅페이지 좌우배열
