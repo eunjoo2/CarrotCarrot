@@ -2,7 +2,7 @@ import tkinter as tk
 
 class Header(tk.Frame):
     def __init__(self, master=None):
-        super().__init__(master, bg="#FFFFFF", height=30)
+        super().__init__(master, bg="#FF6F0F", height=30)
         self.pack(fill="x")
         self.create_widgets()
 
@@ -18,10 +18,6 @@ class Header(tk.Frame):
         self.title = tk.Label(self.top_frame, text="", fg="white", bg=self["bg"], font=("Arial", 16, "bold"))
         self.title.grid(row=0, column=1, sticky="w", padx=5, pady=10)
         self.top_frame.grid_columnconfigure(1, weight=1)
-
-        # self.title = tk.Label(self, text="", fg="#000000", bg=self["bg"], font=("Arial", 12))
-        # self.title.pack(padx=10, pady=10, anchor="w")
-
 
     ###### 아래 부분 추가
     def update_title(self, new_title):
