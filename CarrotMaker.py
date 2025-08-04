@@ -6,6 +6,7 @@ from arealife import AreaLifeBoard
 from User import User
 from HomeArray import HomeArray
 from detailPage import DetailPage
+from AreaMap import AreaMap
 
 
 import tkinter as tk
@@ -60,7 +61,11 @@ class CarrotMaker:
             AreaLifePage(self.body_frame, self.board, self.user)  # 따로 pack 필요 없음 (내부에서 구현됨)
 
         elif name == "동네지도":
-            tk.Label(self.body_frame, text="동네지도 페이지", font=("Arial", 12), bg=self.get_page_color(name)).pack(pady=20)
+            self.body_frame.destroy()
+            self.body_frame = AreaMap(self.root)
+            self.body_frame.pack(expand=True, fill="both")
+
+            #tk.Label(self.body_frame, text="동네지도 페이지", font=("Arial", 12), bg=self.get_page_color(name)).pack(pady=20)
 
         elif name == "채팅":
             tk.Label(self.body_frame, text="채팅 페이지", font=("Arial", 12), bg=self.get_page_color(name)).pack(pady=20)
