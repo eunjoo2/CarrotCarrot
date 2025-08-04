@@ -73,7 +73,7 @@ class CarrotMaker:
             "동네생활": "#FFFACD",
             "동네지도": "#E0FFE0",
             "채팅": "#E0F0FF",
-            "나의당근": "#F5F5F5"
+            "나의당근": "#000000"
         }
         return colors.get(name, "#FFFFFF")
 

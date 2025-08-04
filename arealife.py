@@ -1,5 +1,5 @@
 from datetime import datetime
-from user import User
+from User import User
 
 # # 사용자 클래스 : 사용자 정보
 # class User:
