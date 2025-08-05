@@ -151,13 +151,16 @@ class Chat_page:
         # self.send_button.pack(side="right", padx=10, pady=5)
         #-------------------
 
+
         self.canvas = tk.Canvas(self.frame, bg="white", highlightthickness=0)
         self.scrollbar = ttk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
         self.msg_frame = tk.Frame(self.canvas, bg="white")
 
         self.msg_frame.bind("<Configure>",
-                               lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+                            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
         self.canvas.create_window((0, 0), window=self.msg_frame, anchor="nw")
+
+        self.canvas.pack_propagate(False) # 캔버스 크기가 내용에 맞게 줄지 않도록
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -184,7 +187,7 @@ class Chat_page:
             formatted_msg = {
                 "sender": self.user.nickname,
                 "text": msg,
-                "date": now,
+                "time": now,
             }
             # f"{self.user.nick_name}: {msg}"
             self.msgs.append(formatted_msg) # 메시지 저장🍪🍪🍪🍪
@@ -200,11 +203,17 @@ class Chat_page:
     def display_message(self):
         for msg in self.msgs:
             self.display_single_message(msg)
+        self.canvas.update_idletasks()
+        self.canvas.yview_moveto(1.0)
 
     def display_single_message(self, msg):
         is_me = (msg["sender"] == self.user.nickname)
         bubble_frame = tk.Frame(self.msg_frame, bg="white", pady=2)
-        bubble_frame.pack(anchor="e" if is_me else "w", padx=10, pady=2)
+
+
+        anchor = "e" if is_me else "w"
+        padx = (50, 10) if is_me else (10, 50)
+        bubble_frame.pack(anchor=anchor, padx=padx, pady=2)
 
         # 말풍선 라벨
         bubble = tk.Label(
@@ -220,7 +229,7 @@ class Chat_page:
             padx=10,
             pady=5
         )
-        bubble.pack(anchor="e" if is_me else "w")
+        bubble.pack(anchor=anchor)
 
         # 시간 표시 (작게)
         time_label = tk.Label(
@@ -230,7 +239,12 @@ class Chat_page:
             fg="gray",
             bg="white"
         )
-        time_label.pack(anchor="e" if is_me else "w")
+        time_label.pack(anchor=anchor, pady=(0, 5))
+
+        self.canvas.update_idletasks()
+        self.canvas.yview_moveto(1.0)
+
+
 """
 완, 뒤로가기 버튼, 메시지 저장
 카테고리 연결, 채팅방 자동 시간 연결, 사용자 이미지 연결, 채팅페이지 좌우배열
