@@ -9,19 +9,19 @@ class AreaMap(tk.Frame):
         self.pack(expand=True, fill="both")
 
         self.center = "36.348141,127.384815"
-        self.zoom = 16  # 초기 줌 레벨
-        self.size = "400x600"
-        self.api_key = "AIzaSyDVpf_KQ0Wu_ex6dsr9qbSFP8b6y9_yWv4"  # 본인 키로 교체!
+        self.zoom = 16
+        self.size = "400x600"  # 혹은 400x500 정도로 수정
+
+        self.api_key = "AIzaSyDVpf_KQ0Wu_ex6dsr9qbSFP8b6y9_yWv4"
 
         self.label = tk.Label(self)
-        self.label.pack()
+        self.label.pack(expand=True, fill="both")  # 이미지 라벨이 프레임에 꽉 차도록
 
         self.load_map()
 
-        # 윈도우, 리눅스용 마우스 휠 이벤트 바인딩
-        self.label.bind("<MouseWheel>", self.on_mouse_wheel)       # Windows, MacOS
-        self.label.bind("<Button-4>", self.on_mouse_wheel_linux)    # Linux scroll up
-        self.label.bind("<Button-5>", self.on_mouse_wheel_linux)    # Linux scroll down
+        self.label.bind("<MouseWheel>", self.on_mouse_wheel)
+        self.label.bind("<Button-4>", self.on_mouse_wheel_linux)
+        self.label.bind("<Button-5>", self.on_mouse_wheel_linux)
 
     def load_map(self):
         url = "https://maps.googleapis.com/maps/api/staticmap"
