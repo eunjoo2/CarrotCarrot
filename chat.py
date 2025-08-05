@@ -1,4 +1,4 @@
-
+from tkinter.constants import BOTTOM
 
 from header import Header
 from bottom import bottom
@@ -12,7 +12,10 @@ import tkinter as tk
 from tkinter import ttk
 #🍪🍪🍪
 import datetime
-
+#🍪🍪🍪
+from tkcalendar import Calendar
+    # pip install tkcalendar
+    # 약속잡기 캘린더
 
 class CarrotMaker:
     def __init__(self, root):
@@ -84,7 +87,8 @@ class CarrotMaker:
         }
         return colors.get(name, "#FFFFFF")
 
-    # 채팅방 진입 시
+    # ------------------------------------------------------------todo 채팅 관련 all
+    # ☑️ 채팅방 진입 시 액자 변경
     def chat_content(self, room_info):
         self.body_frame.destroy()
         self.body_frame = tk.Frame(self.root, bg="white")
@@ -93,8 +97,10 @@ class CarrotMaker:
         self.header.update_title(room_info["nickname"])
         self.header.back_button(self.back_chat)
 
+        # 채팅 페이지 진입
         Chat_page(self.body_frame, self.user, room_info)
 
+    # ☑️ 뒤로가기 버튼 생성
     def back_chat(self):
         self.body_frame.destroy()
         self.body_frame = tk.Frame(self.root, bg="white")
@@ -107,16 +113,16 @@ class CarrotMaker:
 
 CHATTING = {} # 채팅메시지
 
-class Chat:
-    def __init__(self, id, buyer, seller, product, date, content):
-        self.id = id # 🍪 00001 ... int
-        self.buyer = buyer # 카테고리(구매) 구분을 위함 # 🍪 "포립 님" ... str
-        self.seller = seller # 카테고리(판매) 구분을 위함 # 🍪 "수리 님" ... str
-        self.product = product # 상품 # 🍪 '한화 이글스 유니폼' ... str
-        self.date = date # 🍪 '년 / 월 / 일' ... str
-        self.content = content  # 🍪 메시지 보관
-
-        self.read_check = False  # 카테고리(안 읽은 채팅방) 구분을 위함 # 🍪 False(안읽음) ... bool
+# class Chat:
+#     def __init__(self, id, buyer, seller, product, date, content):
+#         self.id = id # 🍪 00001 ... int
+#         self.buyer = buyer # 카테고리(구매) 구분을 위함 # 🍪 "포립 님" ... str
+#         self.seller = seller # 카테고리(판매) 구분을 위함 # 🍪 "수리 님" ... str
+#         self.product = product # 상품 # 🍪 '한화 이글스 유니폼' ... str
+#         self.date = date # 🍪 '년 / 월 / 일' ... str
+#         self.content = content  # 🍪 메시지 보관
+#
+#         self.read_check = False  # 카테고리(안 읽은 채팅방) 구분을 위함 # 🍪 False(안읽음) ... bool
 
 
 
@@ -128,46 +134,63 @@ class Chat_page:
         self.room_id = room_id
         self.frame = tk.Frame(parent, bg="white")
         self.frame.pack(expand=True, fill="both")
-        # self.msgs = []
 
         self.room_key = str(room_id["room_id"])
         if self.room_key not in CHATTING:
             CHATTING[self.room_key] = []
         self.msgs = CHATTING[self.room_key]
 
-
         # 채팅방 진입 시 "게시물이름 채팅방"
         tk.Label(self.frame, text=f"[{room_id['title']}] 채팅방", font=("맑은 고딕", 13)).pack(pady=5)
+        tk.Button(self.frame, text="약속 잡기", command = lambda : self.promise(room_id)).pack()
 
-        # # 텍스트 박스
-        # self.text_area = tk.Text(self.frame, height=20, state="disabled", bg="#F5F5F5")
-        # self.text_area.pack(padx=10, pady=10, fill="both", expand=True)
-        #
-        # self.entry = tk.Entry(self.frame)
-        # self.entry.pack(side="left", padx=10, pady=5, fill="x", expand=True)
-        # self.entry.bind("<Return>", self.send_message)
-        #
-        # self.send_button = tk.Button(self.frame, text="전송", command=self.send_message)
-        # self.send_button.pack(side="right", padx=10, pady=5)
-        #-------------------
+        self.top_frame = tk.Frame(self.frame, bg="white")
+        self.top_frame.pack(fill="both", expand=True)
+        self.bottom_frame = tk.Frame(self.frame, bg="white")
+        self.bottom_frame.pack(fill="x")
 
+        self.canvas = tk.Canvas(self.top_frame, bg="white", highlightthickness=0)
+            # highlightthickness = 외곽선 두께
 
-        self.canvas = tk.Canvas(self.frame, bg="white", highlightthickness=0)
-        self.scrollbar = ttk.Scrollbar(self.frame, orient="vertical", command=self.canvas.yview)
+        # ☑️ 마우스 휠 함수
+        def mouse_wheel(event):
+            self.canvas.yview_scroll((-1 * event.delta), "units")
+            # -1 없으면 스크롤이 반대로 작동
+            # 현재
+        self.canvas.bind_all("<MouseWheel>", mouse_wheel) # 마우스 휠 바인딩
+            # bind_all() = 전체 앱에서 마우스 휠 감지할 수 있도록
+
+        # ☑️ 스크롤바, 메시지 프레임
+        self.scrollbar = ttk.Scrollbar(self.top_frame, orient="vertical", command=self.canvas.yview)
+            # yview() = 세로 스크롤 연결
+
         self.msg_frame = tk.Frame(self.canvas, bg="white")
-
         self.msg_frame.bind("<Configure>",
                             lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-        self.canvas.create_window((0, 0), window=self.msg_frame, anchor="nw")
+            # 캔버스는 자동으로 스크롤 범위를 계산하지 않음
+            # 메시지가 늘어나면 scrollregion(스크롤가능 영역)도 수동으로 해야함
+            # bind("이벤트", 함수) ... "<Configure>"은 이벤트 크기or위치 변경 시 발생
+            # self.canvas.bbox("all") 의 return = (x1, y1, x2, y2)
 
-        self.canvas.pack_propagate(False) # 캔버스 크기가 내용에 맞게 줄지 않도록
+        # ☑️ 캔버스_메시지프레임 크기 맞추기 // 보낸사람, 받은사람 좌우 배열을 위함
+        def canvas_sizing(event):
+            canvas_width = event.width
+            self.canvas.itemconfig(self.msg_window, width=canvas_width)
+
+        self.canvas.bind("<Configure>", canvas_sizing)
+        self.msg_window = self.canvas.create_window((0, 0), window=self.msg_frame, anchor="nw")
+            # creat_window(x, y)
+            # 캔버스 안에 메시지 프레임 삽입 (캔버스 스크롤 가능 영역(좌표)을 새로 설정)
+
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
+            # yscrollcommand = 스크롤될 때마다 스크롤 위치 알려줌
+            # scrollbar.set = 스크롤바의 손잡이 위치와 크기를 설정 매서드
 
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
 
         # 하단 입력창
-        entry_frame = tk.Frame(self.frame, bg="white")
+        entry_frame = tk.Frame(self.bottom_frame, bg="white")
         entry_frame.pack(fill="x", pady=5)
 
         self.entry = tk.Entry(entry_frame)
@@ -180,12 +203,14 @@ class Chat_page:
         # 메시지 띄우기
         self.display_message()
 
+
+
     def send_message(self, event=None):
         msg = self.entry.get().strip()
         if msg:
             now = datetime.datetime.now().strftime("%H:%M")
             formatted_msg = {
-                "sender": self.user.nickname,
+                "sender": self.user.nick_name,
                 "text": msg,
                 "time": now,
             }
@@ -206,20 +231,96 @@ class Chat_page:
         self.canvas.update_idletasks()
         self.canvas.yview_moveto(1.0)
 
+
+    # 약속잡기☀️☀️☀️☀️☀️
+    def promise(self, room_info):
+        promise_window = tk.Toplevel(self.frame)
+        promise_window.title("약속잡기")
+        promise_window.geometry("300x500")
+
+        body_frame = tk.Frame(promise_window, bg="white")
+        body_frame.pack(expand=True, fill="both")
+
+        top_frame = tk.Frame(body_frame, bg="white")
+        top_frame.pack(fill="x")
+
+        # 날짜, 시간, 장소 // 약속 전 나에게 알림(x)
+        nick_name = str(room_info["nickname"])
+        label = tk.Label(top_frame, text=f"{nick_name}님과 약속", font=("맑은 고딕", 13, "bold"))
+        label.pack(anchor="nw",padx=10, pady=10)
+
+        date_frame = tk.Frame(body_frame, bg="white", height=60)
+        time_frame = tk.Frame(body_frame, bg="white", height=60)
+        location_frame = tk.Frame(body_frame, bg="white", height=60)
+        calendar_frame = tk.Frame(body_frame, bg="white", height=170)
+        date_frame.pack(fill="x", pady=10)
+        time_frame.pack(fill="x", pady=10)
+        location_frame.pack(fill="x", pady=10)
+        calendar_frame.pack(fill="x",padx=10, pady=10, expand=True)
+
+
+
+        date1 = tk.Label(date_frame, bg="white", text="날짜", font=("맑은 고딕", 11, "bold"))
+        time1 = tk.Label(time_frame, bg="white", text="시간", font=("맑은 고딕", 11, "bold"))
+        location1 = tk.Label(location_frame, bg="white", text="장소", font=("맑은 고딕", 11, "bold"))
+        date1.pack(side="left", padx=10, pady=10)
+        time1.pack(side="left", padx=10, pady=10)
+        location1.pack(side="left", padx=10, pady=10)
+
+
+        promise_btn = tk.Button(body_frame, bg="#FF6F0F",text="완료",font=("맑은 고딕", 12, "bold"),
+                                fg="#FFFFFF", highlightthickness=0, borderwidth=0,height=2)
+        promise_btn.pack(side="bottom",fill="x", pady=5)
+
+        # 캘린더 그림 확인 변수
+        calendar_view = None
+
+        # ☑️ 캘린더 버튼
+        def calendar():
+            nonlocal calendar_view
+            if calendar_view is None:
+                calendar_view = Calendar(calendar_frame, selectmode='day', date_pattern='yyyy-mm-dd')
+                calendar_view.pack()
+            else:
+                calendar_view.destroy()
+                calendar_view = None
+
+        def date_time():
+            now = datetime.datetime.now().strftime("%m월 %d일 %a")
+            if now[0] == 0:
+                now = now[1:]
+
+            if now[-3:] == "Mon":
+                week = "월요일"
+            elif now[-3:] == "Tue":
+                week = "화요일"
+            elif now[-3:] == "Wed":
+                week = "수요일"
+            elif now[-3:] == "Thu":
+                week = "목요일"
+            elif now[-3:] == "Fri":
+                week = "금요일"
+            elif now[-3:] == "Sat":
+                week = "토요일"
+            elif now[-3:] == "Sun":
+                week = "일요일"
+            return now[:-3] + week
+
+        date2 = tk.Button(date_frame, bg="white", text=f"{date_time()}", font=("맑은 고딕", 11, "bold")
+                          , highlightthickness=0, activebackground="white", borderwidth=0, command=calendar)
+        date2.pack(side="right", padx=10, pady=10)
+
+
+
     def display_single_message(self, msg):
-        is_me = (msg["sender"] == self.user.nickname)
+        is_me = (msg["sender"] == self.user.nick_name)
         bubble_frame = tk.Frame(self.msg_frame, bg="white", pady=2)
-
-
-        anchor = "e" if is_me else "w"
-        padx = (50, 10) if is_me else (10, 50)
-        bubble_frame.pack(anchor=anchor, padx=padx, pady=2)
 
         # 말풍선 라벨
         bubble = tk.Label(
             bubble_frame,
             text=msg["text"],
-            bg="#DCF8C6" if is_me else "#FFFFFF",
+            bg="#FF6F0F" if is_me else "#D9D9D9",
             fg="black",
             font=("맑은 고딕", 10),
             bd=1,
@@ -229,7 +330,6 @@ class Chat_page:
             padx=10,
             pady=5
         )
-        bubble.pack(anchor=anchor)
 
         # 시간 표시 (작게)
         time_label = tk.Label(
@@ -239,19 +339,35 @@ class Chat_page:
             fg="gray",
             bg="white"
         )
-        time_label.pack(anchor=anchor, pady=(0, 5))
 
+        # 좌우 배열 조건문
+        if is_me:
+            bubble_frame.pack(anchor="e", padx=10, pady=2)
+            bubble.pack(anchor="e")
+            time_label.pack(anchor="e", pady=(0, 5))
+        else:
+            bubble_frame.pack(anchor="w", padx=10, pady=2)
+            bubble.pack(anchor="w")
+            time_label.pack(anchor="w", pady=(0, 5))
+
+        # ☑️ 최신채팅 스크롤 따라가기
         self.canvas.update_idletasks()
+            # 지금 즉시 레이아웃 처리! 명령코드
+            # 이유 : pack(), grid(), place() 같은 레이아웃 작업은 Tkinter가 비교적 느리게 처리함
         self.canvas.yview_moveto(1.0)
 
-
 """
-완, 뒤로가기 버튼, 메시지 저장
-카테고리 연결, 채팅방 자동 시간 연결, 사용자 이미지 연결, 채팅페이지 좌우배열
+완, 뒤로가기 버튼, 메시지 저장, 채팅내용 자동 시간 연결, 채팅페이지 좌우배열, 스크롤바
+ 
+약속잡기, 사진 보내기(자동 사진 사이즈 조절), 이모지 
+
+상단고정, 읽음/안읽음, 채팅방 나가기 //// 커멘드 함수 엮어야함
+메시지 저장 / 삭제
+채팅방이 없을 때 "채팅방이 없어요."
 
 DB 연결 후>
-채팅방 나가기, 채팅방 자동생성, 사진보내기, 이모지
-약속잡기, 스크롤바
+채팅방 생성, 채팅방 옆 동네 붙이기
+카테고리 연결,  사용자 이미지 연결,
 """
 
 
@@ -264,10 +380,24 @@ class Chat_list:
         # 버튼 카테고리
         self.btn_frame = tk.Frame(self.parent, bg="white")
         self.btn_frame.pack(fill="x", pady=(0,5))
-        tk.Button(self.btn_frame, text="전체", font=("맑은고딕", 12)).pack(side="left")
+        tk.Button(self.btn_frame, text="전체", font=("맑은고딕", 12)).pack(side="left") #command=lambda: chatroom_filter(user,count)
         tk.Button(self.btn_frame, text="판매", font=("맑은고딕", 12)).pack(side="left")
         tk.Button(self.btn_frame, text="구매", font=("맑은고딕", 12)).pack(side="left")
         tk.Button(self.btn_frame, text="안 읽은 채팅방", font=("맑은고딕", 12)).pack(side="left")
+
+        # # ☑️ 카테고리 구분 함수(전체 / 판매 / 구매 / 안 읽은 채팅방)
+        # def chatroom_filter(user_id, count): # 유저, 안 읽은 메시지 개수
+        #     # 전체는 그냥 다가지고 오고
+        #     # user_id 로 seller, buyer 로 구분해서 판매/구매 글 구분
+        #     # 안읽음 생각해보고
+        #     if user_id == seller:
+        #         pass # 판매
+        #     elif user_id == buyer:
+        #         pass # 구매
+        #     elif count != 0:
+        #         pass
+
+
 
         # 채팅 목록 프레임
         self.chat_frame = tk.Frame(self.parent, bg="white")
@@ -283,23 +413,31 @@ class Chat_list:
              "nickname": "B님",
              "area": "서울시 강남구",
              "last_msg": "안녕하세요! 거래 가능할까요?",
-             "last_time": datetime.datetime.now() - datetime.timedelta(days=1)},
+             "last_time": datetime.datetime.now() - datetime.timedelta(days=1),
+             "read_count": 0,
+             },
             {"room_id": "room2",
              "title": "강아지 집",
              "nickname": "철수",
              "area": "대전 서구",
              "last_msg": "내일 볼 수 있을까요?",
-             "last_time": datetime.datetime.now() - datetime.timedelta(days=1)},
+             "last_time": datetime.datetime.now() - datetime.timedelta(days=1),
+             "read_count": 2
+             },
             {"room_id": "room3",
              "title": "바디필로우",
              "nickname": "유리",
              "area": "부산 해운대구",
              "last_msg": "감사합니다!",
-             "last_time": datetime.datetime.now() - datetime.timedelta(days=3)}]
+             "last_time": datetime.datetime.now() - datetime.timedelta(days=3),
+             "read_count": 1
+             }
+        ]
 
         for room in self.chat_rooms:
             self.Chat_list_view(room)
 
+    # ☑️ 채팅 리스트 GUI
     def Chat_list_view(self, room):
         box = tk.Frame(self.chat_frame, bg="white")
         box.pack(fill="x", padx=10, pady=5)
@@ -331,13 +469,34 @@ class Chat_list:
         last_msg.pack(side="right", anchor="se")
 
         # 클릭 이벤트
-        self.bind_all_widgets(box, lambda e, r=room: self.chat_content(r))
+        self.chatlist_click_left(box, lambda e, r=room: self.chat_content(r))
+            # e에 이벤트 r에 룸을 담아서 r을 넘겨주고
+            # e는 bind()를 사용할 때 전달됨.
+        self.chatlist_click_right(box, lambda e, r=room: self.chatlist_clickmenu(e, r))
 
-    def bind_all_widgets(self, widget, callback):
+    # ☑️ 채팅방 진입(마우스 왼)
+    def chatlist_click_left(self, widget, callback):
         widget.bind("<Button-1>", callback)
         for child in widget.winfo_children():
-            self.bind_all_widgets(child, callback)
+            self.chatlist_click_left(child, callback)
+        # box 프레임의 모든 자식들을 묶어서
+        # 재귀는 for문 돌듯이 돎, 자식이 없다면 빈리스트 반환... 종료
+        # 결국 모든 자식들을 묶어묶음 (바인딩)
 
+    # ☑️ 채팅방 설정(마우스 오)
+    def chatlist_click_right(self, widget, callback):
+        widget.bind("<Button-3>", callback)
+        for child in widget.winfo_children():
+            self.chatlist_click_right(child, callback)
+
+    # ☑️ 채팅방 설정메뉴 (읽음표시 / 상단고정 / 채팅방나가기)
+    def chatlist_clickmenu(self, event, room): # + , room
+        menu = tk.Menu(self.parent, tearoff=0)  # 부모는 frame이든 canvas든 상관없음
+        menu.add_command(label="읽음으로 표시")  # command=lambda: self.mark_as_read(room)
+        menu.add_command(label="상단 고정") # command=lambda: self.pin_room(room)
+        menu.add_command(label="채팅방 나가기") # command=lambda: self.leave_chatroom(room)
+        menu.tk_popup(event.x_root, event.y_root)
+        menu.grab_release() # 다른곳 누르면 메뉴 꺼짐
 
 
     def get_days_ago_text(self, last_time):
