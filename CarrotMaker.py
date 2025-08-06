@@ -62,10 +62,12 @@ class CarrotMaker:
 
         # 페이지 조건별 분기
         if name == "홈":
+            self.body_frame.destroy()
             self.body_frame = HomeArray(self.root)
 
 
         elif name == "동네생활":
+            self.body_frame.destroy()
             AreaLifePage(self.body_frame, self.board, self.user)  # 따로 pack 필요 없음 (내부에서 구현됨)
 
         elif name == "동네지도":
@@ -86,7 +88,9 @@ class CarrotMaker:
                 "name": "돌맹구",
                 "temp": "36.7"
             }
-            self.body_frame = MyCarrotPage(self.root, user_info=user_info)
+            # self.body_frame = MyCarrotPage(self.root, user_info=user_info)
+            self.body_frame = MyCarrotPage(self.root, show_page_callback=self.show_page, user_info=user_info)
+
             self.body_frame.pack(fill="both", expand=True)
             self.header.update_title("나의 당근")
 
@@ -96,7 +100,7 @@ class CarrotMaker:
     def show_detail_page(self, item_id):
         self.header.update_title("상세")
         #self.home.pack_forget()  # 홈 화면 숨기기
-        self.detail = DetailPage(self.root, item_id)  # 👈 item_id 전달
+        self.detail = DetailPage(self.root, item_id)  # item_id 전달
         self.detail.pack()
 
     # def get_page_color(self, name):
